@@ -17,10 +17,17 @@ namespace PromoCodeFactory.WebHost.Controllers
     public class EmployeesController : ControllerBase
     {
         private readonly IRepository<Employee> _employeeRepository;
+        private readonly IRepository<Role> _roleRepository;
 
-        public EmployeesController(IRepository<Employee> employeeRepository)
+        //public EmployeesController(IRepository<Employee> employeeRepository)
+        //{
+        //    _employeeRepository = employeeRepository;
+        //}
+
+        public EmployeesController(IRepository<Employee> employeeRepository, IRepository<Role> roleRepository)
         {
             _employeeRepository = employeeRepository;
+            _roleRepository = roleRepository;
         }
 
 
@@ -89,7 +96,7 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// Добавить данные сотрудника
         /// </summary>
         [HttpPost]
-        public async Task<ActionResult> InsEmployeeAsync(string fname, string lname, string email)
+        public async Task<ActionResult> InsEmployeeAsync(string fname, string lname, string email, string role)
         {
             Employee employee = new Employee();
             employee.Id = Guid.NewGuid();
@@ -98,6 +105,11 @@ namespace PromoCodeFactory.WebHost.Controllers
             employee.Email = email;
             employee.AppliedPromocodesCount = 0;
             employee.Roles = new List<Role>();
+
+            IEnumerable<Role> roles = await _roleRepository.GetAllAsync();
+            Role _role = roles.Where(x => x.Name == role).First();
+            if (_role != null)
+            { employee.Roles.Add(_role); }
 
             _employeeRepository.InsEmpl(employee);
 

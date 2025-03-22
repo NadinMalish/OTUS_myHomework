@@ -83,12 +83,25 @@ namespace PromoCodeFactory.WebHost.Controllers
         /// <summary>
         /// Удалить данные сотрудника по Id
         /// </summary>
-        [HttpDelete("{id:guid}")]
+        [HttpDelete]
         public async Task<ActionResult> DelEmployeeByIdAsync(Guid id)
         {
-            _employeeRepository.DelById(id);
+            try
+            {
+                var employee = await _employeeRepository.GetByIdAsync(id);
 
-            return Ok();
+                if (employee == null)
+                    return NotFound();
+
+                _employeeRepository.DelById(id);
+
+                return Ok();
+            }
+
+            catch
+            {
+                return BadRequest();
+            }
         }
 
 
@@ -98,41 +111,57 @@ namespace PromoCodeFactory.WebHost.Controllers
         [HttpPost]
         public async Task<ActionResult> InsEmployeeAsync(string fname, string lname, string email, string role)
         {
-            Employee employee = new Employee();
-            employee.Id = Guid.NewGuid();
-            employee.FirstName = fname;
-            employee.LastName = lname;
-            employee.Email = email;
-            employee.AppliedPromocodesCount = 0;
-            employee.Roles = new List<Role>();
+            try
+            {
+                Employee employee = new Employee();
+                employee.Id = Guid.NewGuid();
+                employee.FirstName = fname;
+                employee.LastName = lname;
+                employee.Email = email;
+                employee.AppliedPromocodesCount = 0;
+                employee.Roles = new List<Role>();
 
-            IEnumerable<Role> roles = await _roleRepository.GetAllAsync();
-            Role _role = roles.Where(x => x.Name == role).First();
-            if (_role != null)
-            { employee.Roles.Add(_role); }
+                IEnumerable<Role> roles = await _roleRepository.GetAllAsync();
+                Role _role = roles.Where(x => x.Name == role).FirstOrDefault();
+                if (_role != null)
+                { employee.Roles.Add(_role); }
 
-            _employeeRepository.InsEmpl(employee);
+                _employeeRepository.InsEmpl(employee);
 
-            return Ok();
+                return Ok();
+            }
+
+            catch
+            {
+                return BadRequest();
+            }
         }
 
         /// <summary>
         /// Обновить данные сотрудника
         /// </summary>
-        [HttpPut]
+        [HttpPut("{id:guid}")]
         public async Task<ActionResult> UpdEmployeeAsync(Guid id, string fname, string lname, string email)
         {
-            Employee employee = await _employeeRepository.GetByIdAsync(id);
-            if (employee != null)
+            try
             {
+                Employee employee = await _employeeRepository.GetByIdAsync(id);
+                if (employee == null)
+                    return NotFound();
+
                 employee.FirstName = fname;
                 employee.LastName = lname;
                 employee.Email = email;
+
+                _employeeRepository.UpdEmpl(employee);
+
+                return Ok();
             }
 
-            _employeeRepository.UpdEmpl(employee);
-
-            return Ok();
+            catch
+            {
+                return BadRequest();
+            }
         }
 
     }

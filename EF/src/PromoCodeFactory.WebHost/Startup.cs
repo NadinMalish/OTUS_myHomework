@@ -1,12 +1,16 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using PromoCodeFactory.Core.Abstractions.Repositories;
 using PromoCodeFactory.Core.Domain.Administration;
 using PromoCodeFactory.Core.Domain.PromoCodeManagement;
+using PromoCodeFactory.DataAccess;
 using PromoCodeFactory.DataAccess.Data;
 using PromoCodeFactory.DataAccess.Repositories;
+using System.IO;
 
 namespace PromoCodeFactory.WebHost
 {
@@ -16,6 +20,15 @@ namespace PromoCodeFactory.WebHost
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json")
+                .Build();
+
+            services.AddDbContext<AppDbContext>(optionsBuilder
+                => optionsBuilder
+                .UseSqlite(configuration.GetConnectionString("DefaultConnection")));
+
             services.AddControllers();
             services.AddScoped(typeof(IRepository<Employee>), (x) =>
                 new InMemoryRepository<Employee>(FakeDataFactory.Employees));

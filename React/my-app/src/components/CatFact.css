@@ -1,0 +1,10 @@
+
+.msgItem {
+    color: darkgreen;
+    background-color: bisque;
+}
+
+.msgErr {
+    color: red;
+    background-color: yellow;
+}

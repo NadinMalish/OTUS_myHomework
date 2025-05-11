@@ -8,8 +8,8 @@ function App() {
 
   return (
     <> 
-      {/* <LinkRoute /> */}
-      <PrivatePage />
+      <LinkRoute />
+      {/* <PrivatePage /> */}
     </>
   )
 }

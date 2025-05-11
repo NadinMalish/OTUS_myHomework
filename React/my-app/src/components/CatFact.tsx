@@ -14,18 +14,20 @@ function CatFact() {
           console.log(dan);
     };
 
-    let item;
-    if (res){
-        item = <ItemData msg={dan} />
-    } else {
-        item = <ErrData />
-    }
+    // let item;
+    // if (res){
+    //     item = <ItemData msg={dan} />
+    // } else {
+    //     item = <ErrData />
+    // }
   
     
     return (
         <h1>
             <button onClick={btnLoad}> CatFact Loader</button>
-            {item}
+            {/* {item} */}
+            {res && <ItemData msg={dan} />}
+            {!res && <ErrData />}            
         </h1>
     );
   }
